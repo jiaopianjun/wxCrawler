@@ -104,14 +104,17 @@ class WxCrawler
 		//待获取item                
 		$item = [
 					'ct' => 'date',//发布时间
-					'msg_title' => 'title',//描述
-					'msg_desc' => 'digest',//描述
+					'msg_title' => 'digest', // 标题
+					'msg_desc' => 'digestDesc', // 描述
 					'msg_link' => 'content_url',//文章链接
 					'msg_cdn_url' => 'cover',//封面图片链接
 					'nickname' => 'wechatname',//公众号名称
+					'ori_head_img_url' => 'headImgUrl',//公众号头像
 				];
 		$basicInfo = [
 			'author' => '',
+			'wechatId' => '', // 公众号微信号
+			'wechatDesc' => '',
 			'copyright_stat' => '',
 		];
 		foreach ($item as $k => $v) {
@@ -128,10 +131,17 @@ class WxCrawler
 			}
 		}
 		/** 获取作者 */
-		preg_match('/<em class="rich_media_meta rich_media_meta_text">(.*?)<\/em>/s', $content, $matchAuthor);
+		preg_match('/<strong class="profile_nickname">(.*?)<\/strong>/s', $content, $matchAuthor);
 		if(!empty($matchAuthor[1])) $basicInfo['author'] = $matchAuthor[1];
+		// 获取公众号微信号
+		preg_match('/<span class="profile_meta_value">(.*?)<\/span>/s', $content, $matchWId);
+		if(!empty($matchWId[1])) $basicInfo['wechatId'] = $matchWId[1];
+		
+		preg_match_all('/<span class="profile_meta_value">(.*?)<\/span>/s', $content, $matchDesc);
+		if(!empty($matchDesc[1])) $basicInfo['wechatDesc'] = $matchDesc[1][1];
+		
 		/** 文章类型 */
-		preg_match('/<span id="copyright_logo" class="rich_media_meta meta_original_tag">(.*?)<\/span>/s', $content, $matchType);
+		preg_match('/<span class="rich_media_meta rich_media_meta_nickname" id="profileBt" >(.*?)<\/span>/s', $content, $matchType);
 		if(!empty($matchType[1])) $basicInfo['copyright_stat'] = $matchType[1];
 
 		return $basicInfo;
