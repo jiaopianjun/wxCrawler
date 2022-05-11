@@ -80,7 +80,7 @@ class WxCrawler
 	 */
 	public function contentHandle($content)
 	{
-        $content_html_pattern = '/<div class="rich_media_content " id="js_content">(.*?)<\/div>/s';
+        $content_html_pattern = '/<div class="rich_media_content " id="js_content" style="visibility: hidden">(.*?)<\/div>/s';
         preg_match_all($content_html_pattern, $content, $html_matchs);
         $content_html = $html_matchs[0][0];
         /** @var  带图片html文本 */
@@ -90,7 +90,7 @@ class WxCrawler
         /** @var  无图html文本 */
         $content_text = preg_replace('/<img.*?>/s','',$content_html);
 
-        return [$content_html,$content_text];
+        return [$content_html, $content_text];
 	}
 	/**
 	 * 获取文章的基本信息
@@ -103,14 +103,14 @@ class WxCrawler
 	{	
 		//待获取item                
 		$item = [
-					'ct' => 'date',//发布时间
-					'msg_title' => 'digest', // 标题
-					'msg_desc' => 'digestDesc', // 描述
-					'msg_link' => 'content_url',//文章链接
-					'msg_cdn_url' => 'cover',//封面图片链接
-					'nickname' => 'wechatname',//公众号名称
-					'ori_head_img_url' => 'headImgUrl',//公众号头像
-				];
+            'ct' => 'date',//发布时间
+            'msg_title' => 'digest', // 标题
+            'msg_desc' => 'digestDesc', // 描述
+            'msg_link' => 'content_url',//文章链接
+            'msg_cdn_url' => 'cover',//封面图片链接
+            'nickname' => 'wechatname',//公众号名称
+            'ori_head_img_url' => 'headImgUrl',//公众号头像
+        ];
 		$basicInfo = [
 			'author' => '',
 			'wechatId' => '', // 公众号微信号
@@ -119,11 +119,12 @@ class WxCrawler
 		];
 		foreach ($item as $k => $v) {
 			if ($k == 'msg_title') {
-                $pattern = '/ var '.$k." = '(.*?)'/s";
+                $pattern = '/var '.$k." = '(.*?)'/s";
 			} else {
-                $pattern = '/ var '.$k.' = "(.*?)";/s';
+                $pattern = '/var '.$k.' = "(.*?)";/s';
 			}
 			preg_match_all($pattern,$content,$matches);
+			
 			if(array_key_exists(1, $matches) && !empty($matches[1][0])){
 				$basicInfo[$v] = $this->htmlTransform($matches[1][0]);
 			} else {
